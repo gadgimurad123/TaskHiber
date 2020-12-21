@@ -4,12 +4,14 @@ import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
     private static UserDaoHibernateImpl instance;
+    private static SessionFactory factory;
 
     public static UserDaoHibernateImpl getInstance() {
         if (instance == null) {
@@ -21,13 +23,20 @@ public class UserDaoHibernateImpl implements UserDao {
     public UserDaoHibernateImpl() {
     }
 
+    static {
+        try {
+            factory = Util.getSessionFactory();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void createUsersTable() {
-        SessionFactory factory = null;
+        Transaction transaction = null;
         try {
-            factory = Util.getHibernateConnection();
             Session session = factory.getCurrentSession();
-            session.beginTransaction();
+            transaction = session.beginTransaction();
 
             session.createSQLQuery("CREATE TABLE USERS (" +
                     "ID        BIGINT       NOT NULL AUTO_INCREMENT," +
@@ -37,95 +46,100 @@ public class UserDaoHibernateImpl implements UserDao {
                     "PRIMARY KEY ( ID )" +
                     ");").executeUpdate();
 
-            session.getTransaction().commit();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            if (factory != null) {
-                factory.close();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
         }
     }
 
     @Override
     public void dropUsersTable() {
-        SessionFactory factory = null;
+        Transaction transaction = null;
         try {
-            factory = Util.getHibernateConnection();
             Session session = factory.getCurrentSession();
-            session.beginTransaction();
+            transaction = session.beginTransaction();
 
             session.createSQLQuery("DROP TABLE USERS").executeUpdate();
 
-            session.getTransaction().commit();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            if (factory != null) {
-                factory.close();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        SessionFactory factory = null;
+        Transaction transaction = null;
         try {
-            factory = Util.getHibernateConnection();
             Session session = factory.getCurrentSession();
             User user = new User(name, lastName, age);
-            session.beginTransaction();
+            transaction = session.beginTransaction();
 
             session.save(user);
 
-            session.getTransaction().commit();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            if (factory != null) {
-                factory.close();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+        }
+    }
+
+
+    public static void saveUser1(String name, String lastName, byte age) {
+        Transaction transaction = null;
+        try {
+            Session session = factory.openSession();
+            User user = new User(name, lastName, age);
+            transaction = session.beginTransaction();
+
+            session.save(user);
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
         }
     }
 
     @Override
     public void removeUserById(long id) {
-        SessionFactory factory = null;
+        Transaction transaction = null;
         try {
-            factory = Util.getHibernateConnection();
             Session session = factory.getCurrentSession();
-            session.beginTransaction();
+            transaction = session.beginTransaction();
 
             User user = (User) session.get(User.class, id);
 
             session.delete(user);
-            session.getTransaction().commit();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            if (factory != null) {
-                factory.close();
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
         }
     }
 
     @Override
     public List<User> getAllUsers() {
+        Transaction transaction = null;
         List<User> users = null;
-        SessionFactory factory = null;
         try {
-            factory = Util.getHibernateConnection();
             Session session = factory.getCurrentSession();
-            session.beginTransaction();
+            transaction = session.beginTransaction();
 
             users = session.createQuery("from User").list();
 
-            session.getTransaction().commit();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            if (factory != null) {
-                factory.close();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
         }
         return users;
@@ -133,23 +147,20 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
+        Transaction transaction = null;
         List<User> users;
-        SessionFactory factory = null;
         try {
-            factory = Util.getHibernateConnection();
             Session session = factory.getCurrentSession();
-            session.beginTransaction();
+            transaction = session.beginTransaction();
 
             users = session.createQuery("from User").list();
             for (User user : users)
                 session.delete(user);
 
-            session.getTransaction().commit();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            if (factory != null) {
-                factory.close();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
         }
     }

@@ -25,8 +25,8 @@ public class Util {
         return connection;
     }
 
-    public static SessionFactory getHibernateConnection() throws ClassNotFoundException, SQLException {
-        // TODO: change to "without config"
+    public static SessionFactory getSessionFactory() throws ClassNotFoundException, SQLException {
+        // TODO: change to "without XML"
         SessionFactory sessionFactory = new Configuration()
                 .configure("hibernate.cfg.xml")
                 .addAnnotatedClass(User.class)
