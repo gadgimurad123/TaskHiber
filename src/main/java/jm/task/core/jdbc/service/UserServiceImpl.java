@@ -9,42 +9,46 @@ import java.util.List;
 
 public class UserServiceImpl implements UserService {
     private UserDaoJDBCImpl userDaoJDBCImpl;
+    private UserDaoHibernateImpl userDaoHibernateImpl;
 
     public UserServiceImpl() {
-        this.userDaoJDBCImpl = UserDaoJDBCImpl.getInstance();
+        this.userDaoHibernateImpl = UserDaoHibernateImpl.getInstance();
+//        this.userDaoJDBCImpl = UserDaoJDBCImpl.getInstance();
     }
 
     @Override
     public void createUsersTable() {
-        userDaoJDBCImpl.createUsersTable();
+        userDaoHibernateImpl.createUsersTable();
+//        userDaoJDBCImpl.createUsersTable();
     }
 
     @Override
     public void dropUsersTable() {
-        userDaoJDBCImpl.dropUsersTable();
+        userDaoHibernateImpl.dropUsersTable();
+//        userDaoJDBCImpl.dropUsersTable();
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        try {
-            userDaoJDBCImpl.saveUser(name, lastName, age);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        userDaoHibernateImpl.saveUser(name, lastName, age);
+//        userDaoJDBCImpl.saveUser(name, lastName, age);
     }
 
     @Override
     public void removeUserById(long id) {
-        userDaoJDBCImpl.removeUserById(id);
+        userDaoHibernateImpl.removeUserById(id);
+//        userDaoJDBCImpl.removeUserById(id);
     }
 
     @Override
     public List<User> getAllUsers() {
-        return userDaoJDBCImpl.getAllUsers();
+        return userDaoHibernateImpl.getAllUsers();
+//        return userDaoJDBCImpl.getAllUsers();
     }
 
     @Override
     public void cleanUsersTable() {
-        userDaoJDBCImpl.cleanUsersTable();
+        userDaoHibernateImpl.cleanUsersTable();
+//        userDaoJDBCImpl.cleanUsersTable();
     }
 }
