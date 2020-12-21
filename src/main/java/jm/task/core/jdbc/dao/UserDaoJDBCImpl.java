@@ -101,6 +101,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public List<User> getAllUsers() {
         List<User> usersList = new ArrayList<>();
+
         String sql = "SELECT ID, NAME, LAST_NAME, AGE FROM USERS";
 
         Statement statement = null;
