@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class Util {
     private static final String driver = "com.mysql.cj.jdbc.Driver";
-    private static final String url = "jdbc:mysql://localhost:3306/my_db?useUnicode=true&serverTimezone=UTC";
+    private static final String url = "jdbc:mysql://localhost:3306/new_schema123?useUnicode=true&serverTimezone=UTC";
     private static final String userName = "root";
     private static final String pass = "root";
 
