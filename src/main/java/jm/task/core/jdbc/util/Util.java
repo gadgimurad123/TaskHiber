@@ -1,9 +1,5 @@
 package jm.task.core.jdbc.util;
 
-import jm.task.core.jdbc.model.User;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -23,14 +19,5 @@ public class Util {
             e.printStackTrace();
         }
         return connection;
-    }
-
-    public static SessionFactory getHibernateConnection() throws ClassNotFoundException, SQLException {
-        // TODO: change to "without config"
-        SessionFactory sessionFactory = new Configuration()
-                .configure("hibernate.cfg.xml")
-                .addAnnotatedClass(User.class)
-                .buildSessionFactory();
-        return sessionFactory;
     }
 }
