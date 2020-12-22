@@ -2,19 +2,14 @@ package jm.task.core.jdbc.util;
 
 import jm.task.core.jdbc.model.User;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Environment;
-import org.hibernate.metamodel.Metadata;
-import org.hibernate.metamodel.MetadataSources;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Properties;
 
 public class Util {
     private static final String driver = "com.mysql.cj.jdbc.Driver";
@@ -23,8 +18,8 @@ public class Util {
     private static final String pass = "root";
 
     private static final SessionFactory factory;
-    private static final StandardServiceRegistry standardServiceRegistry;
 
+    // Work with JDBC
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
         Connection connection = null;
         try {
@@ -36,48 +31,31 @@ public class Util {
         return connection;
     }
 
+    // Work with Hibernate
     static {
-        // Creating StandardServiceRegistryBuilder
-        StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
+        Properties prop= new Properties();
 
-        // Hibernate settings which is equivalent to hibernate. cfg. xml's properties
-        Map<String, String> dbSettings = new HashMap<>();
-        dbSettings.put(Environment.URL, "jdbc:mysql://localhost:3306/my_db?useSSL=false&serverTimezone=UTC");
-        dbSettings.put(Environment.USER, "root");
-        dbSettings.put(Environment.PASS, "root");
-        dbSettings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
-        dbSettings.put(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");
-        dbSettings.put(Environment.SHOW_SQL, "true");
-        dbSettings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+        prop.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/my_db?useSSL=false&serverTimezone=UTC");
+        prop.setProperty("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver");
 
-        // Apply database settings
-        registryBuilder.applySettings(dbSettings);
+        prop.setProperty("hibernate.connection.username", "root");
+        prop.setProperty("hibernate.connection.password", "root");
 
-        // Creating registry
-        standardServiceRegistry = registryBuilder.build();
+        prop.setProperty("current_session_context_class", "thread");
+        prop.setProperty("dialect", "org.hibernate.dialect.MySQLDialect");
+        prop.setProperty("show_sql", "true");
 
-        // Creating MetadataSources
-        MetadataSources sources = new MetadataSources(standardServiceRegistry);
+        ServiceRegistry serviceRegistry = new ServiceRegistryBuilder()
+                .applySettings(prop)
+                .buildServiceRegistry();
 
-        // Creating Metadata
-        Metadata metadata = sources.getMetadataBuilder().build();
-
-        // Creating SessionFactory
-        factory = metadata.getSessionFactoryBuilder().build();
+        factory = new Configuration()
+                .configure()
+                .addAnnotatedClass(User.class)
+                .buildSessionFactory(serviceRegistry);
     }
 
     public static SessionFactory getSessionFactory() {
         return factory;
     }
-
-//    public static SessionFactory getSessionFactory() throws ClassNotFoundException, SQLException {
-//        // TODO: change to "without XML"
-//        SessionFactory sessionFactory = new Configuration()
-//                .configure("hibernate.cfg.xml")
-//                .addAnnotatedClass(User.class)
-//                .buildSessionFactory();
-//        return sessionFactory;
-//    }
-
-
 }

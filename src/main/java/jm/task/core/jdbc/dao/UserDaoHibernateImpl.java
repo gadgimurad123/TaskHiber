@@ -70,27 +70,9 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         Transaction transaction = null;
+        User user = new User(name, lastName, age);
         try {
             Session session = factory.getCurrentSession();
-            User user = new User(name, lastName, age);
-            transaction = session.beginTransaction();
-
-            session.save(user);
-
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-        }
-    }
-
-
-    public static void saveUser1(String name, String lastName, byte age) {
-        Transaction transaction = null;
-        try {
-            Session session = factory.openSession();
-            User user = new User(name, lastName, age);
             transaction = session.beginTransaction();
 
             session.save(user);
